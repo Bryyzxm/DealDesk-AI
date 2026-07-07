@@ -42,11 +42,63 @@ export type DealRequestInput = {
   readonly fixtureSource?: string;
 };
 
+export type CrmAccountContext = {
+  readonly customerTier: string;
+  readonly priorDiscount: string;
+  readonly hasActiveContract: boolean;
+  readonly owner: string;
+};
+
+export type ToolCallId = `tool_${string}`;
+
+export type WorkflowToolCall = {
+  readonly id: ToolCallId;
+  readonly toolName: string;
+  readonly sideEffectClass: "read";
+  readonly status: "success" | "blocked" | "failed";
+  readonly durationMs: number;
+  readonly resultSummary: string;
+  readonly error?: {
+    readonly code: "crm_account_not_found" | "crm_adapter_unavailable" | "crm_account_name_missing";
+    readonly message: string;
+  };
+};
+
+export type WorkflowBlocker = {
+  readonly reason: string;
+  readonly blocksQuoteContinuation: boolean;
+};
+
+export type CrmLookupState =
+  | {
+      readonly status: "success";
+      readonly accountName: string;
+      readonly accountContext: CrmAccountContext;
+      readonly toolCall: WorkflowToolCall;
+    }
+  | {
+      readonly status: "missing_record";
+      readonly accountName: string;
+      readonly blocker: WorkflowBlocker;
+      readonly toolCall: WorkflowToolCall;
+    }
+  | {
+      readonly status: "account_name_missing";
+      readonly accountName: string;
+      readonly blocker: WorkflowBlocker;
+      readonly toolCall: WorkflowToolCall;
+    }
+  | {
+      readonly status: "adapter_failure";
+      readonly accountName: string;
+      readonly toolCall: WorkflowToolCall;
+    };
+
 export type AuditEvent = {
   readonly id: AuditEventId;
   readonly runId: WorkflowRunId;
   readonly createdAt: string;
-  readonly type: "deal_request_intake_created" | "deal_facts_extracted";
+  readonly type: "deal_request_intake_created" | "deal_facts_extracted" | "crm_account_context_retrieved";
   readonly source: string;
   readonly summary: string;
 };
@@ -57,11 +109,18 @@ export type WorkflowRun = {
   readonly dealRequest: DealRequestInput;
   readonly extractionStatus?: "in_progress" | "complete";
   readonly dealFactExtraction?: DealFactExtraction;
+  readonly crmLookup?: CrmLookupState;
   readonly events: readonly AuditEvent[];
 };
 
 export type DomainError = {
-  readonly code: "request_text_required" | "workflow_run_not_found" | "deal_fact_extraction_invalid";
+  readonly code:
+    | "request_text_required"
+    | "workflow_run_not_found"
+    | "deal_fact_extraction_invalid"
+    | "crm_account_name_missing"
+    | "crm_account_not_found"
+    | "crm_adapter_failure";
   readonly message: string;
   readonly recoverable: boolean;
   readonly auditEventId?: AuditEventId;
@@ -77,6 +136,10 @@ export function isWorkflowRunId(value: string): value is WorkflowRunId {
 
 export function createAuditEventId(): AuditEventId {
   return `evt_${crypto.randomUUID()}`;
+}
+
+export function createToolCallId(): ToolCallId {
+  return `tool_${crypto.randomUUID()}`;
 }
 
 export function createUtcTimestamp(): string {
