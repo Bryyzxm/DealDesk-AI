@@ -38,12 +38,20 @@ export function DealIntakeForm({ initialInput }: DealIntakeFormProps) {
 
   return (
     <main className="min-h-dvh bg-[#0E1116] px-4 py-8 text-[#F4F7FB] sm:px-6 lg:px-8">
+      <a className="app-skip-link" href="#deal-intake-content">
+        Skip to deal intake content
+      </a>
       <div className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
-        <section className="rounded-2xl border border-[#2F3A49] bg-[#151A22] p-6 shadow-2xl shadow-black/20">
+        <section
+          aria-labelledby="deal-intake-heading"
+          className="rounded-2xl border border-[#2F3A49] bg-[#151A22] p-6 shadow-2xl shadow-black/20"
+          id="deal-intake-content"
+          tabIndex={-1}
+        >
           <p className="font-mono text-xs uppercase tracking-[0.24em] text-[#7E8A9A]">
             DealDesk AI / Deal Intake
           </p>
-          <h1 className="mt-3 text-3xl font-semibold tracking-tight text-white">
+          <h1 className="mt-3 text-3xl font-semibold tracking-tight text-white" id="deal-intake-heading">
             Submit messy deal request
           </h1>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-[#B9C3D1]">
@@ -62,7 +70,7 @@ export function DealIntakeForm({ initialInput }: DealIntakeFormProps) {
             </div>
           ) : null}
 
-          <form action={formAction} className="mt-6 grid gap-5">
+          <form action={formAction} aria-labelledby="deal-intake-heading" className="mt-6 grid gap-5">
             <input name="fixtureSource" type="hidden" value={input.fixtureSource} />
             <Field
               id="sender"
@@ -117,7 +125,7 @@ export function DealIntakeForm({ initialInput }: DealIntakeFormProps) {
                 {pending ? "Creating run..." : "Create workflow run"}
               </Button>
               <Link
-                className="inline-flex h-10 items-center justify-center rounded-md border border-[#2F3A49] bg-transparent px-6 text-sm font-medium text-[#F4F7FB] transition hover:bg-[#1D2430] disabled:pointer-events-none disabled:opacity-50"
+                className="app-focus-ring inline-flex h-10 items-center justify-center rounded-md border border-[#2F3A49] bg-transparent px-6 text-sm font-medium text-[#F4F7FB] hover:bg-[#1D2430] disabled:pointer-events-none disabled:opacity-50"
                 href="/?fixture=messy"
               >
                 Load seeded messy inquiry
