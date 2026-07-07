@@ -2,7 +2,9 @@
 
 import { createWorkflowRunFromIntake } from "@/server/application/intake";
 import { extractDealFactsForRun } from "@/server/application/extract";
+import { retrieveCrmAccountContextForRun } from "@/server/application/crm-context";
 import { findWorkflowRunById, saveWorkflowRun } from "@/server/application/workflow-run-store";
+import { createCrmMockAdapter } from "@/server/adapters/crm-mock";
 import { isWorkflowRunId } from "@/server/domain/workflow-run";
 import { notFound, redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
@@ -52,6 +54,24 @@ export async function extractDealFacts(formData: FormData): Promise<void> {
   }
 
   await extractDealFactsForRun(run);
+  revalidatePath(`/runs/${runId}`);
+  redirect(`/runs/${runId}`);
+}
+
+export async function retrieveCrmAccountContext(formData: FormData): Promise<void> {
+  const runId = getFormString(formData, "runId");
+
+  if (!isWorkflowRunId(runId)) {
+    notFound();
+  }
+
+  const run = await findWorkflowRunById(runId);
+
+  if (!run) {
+    notFound();
+  }
+
+  await retrieveCrmAccountContextForRun(run, createCrmMockAdapter());
   revalidatePath(`/runs/${runId}`);
   redirect(`/runs/${runId}`);
 }
