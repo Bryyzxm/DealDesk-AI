@@ -1,9 +1,11 @@
 import { notFound } from "next/navigation";
 
 import { extractDealFacts } from "@/app/actions";
+import { CommandPalette } from "@/app/command-palette";
 import { findWorkflowRunById } from "@/server/application/workflow-run-store";
 import type { ExtractedDealFact, MissingDealFact, WorkflowRun } from "@/server/domain/workflow-run";
 import { isWorkflowRunId } from "@/server/domain/workflow-run";
+import { CrmContextPanel } from "./crm-context-panel";
 
 type RunPageProps = {
   readonly params: Promise<{ readonly runId: string }>;
@@ -22,31 +24,50 @@ export default async function RunPage({ params }: RunPageProps) {
     notFound();
   }
 
-  const hasExtraction = Boolean(run.dealFactExtraction);
+  const hasCompleteExtraction = run.extractionStatus === "complete" && Boolean(run.dealFactExtraction);
   const blockingMissingFacts = run.dealFactExtraction?.missingFacts.filter(
     (fact) => fact.blocksQuoteContinuation,
   ) ?? [];
+  const needsClarification = blockingMissingFacts.length > 0;
+  const missingFieldNames = formatFieldList(blockingMissingFacts.map((fact) => fact.field));
+  const quoteSendReason = blockingMissingFacts.length > 0
+    ? `Blocked: missing ${missingFieldNames} before quote continuation.`
+    : "Blocked: approval is required before customer send.";
 
   return (
-    <main className="min-h-dvh bg-[#0E1116] px-4 py-8 text-[#F4F7FB] sm:px-6 lg:px-8">
-      <div className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-[minmax(0,1fr)_380px]">
-        <section className="rounded-2xl border border-[#2F3A49] bg-[#151A22] p-6 shadow-2xl shadow-black/20">
+    <>
+      <CommandPalette currentRunHref={`/runs/${run.id}`} />
+      <main className="min-h-dvh bg-[#0E1116] px-4 py-8 text-[#F4F7FB] sm:px-6 lg:px-8">
+        <a className="app-skip-link" href="#workflow-run-content">
+          Skip to workflow run content
+        </a>
+        <div className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-[minmax(0,1fr)_380px]">
+        <section
+          aria-labelledby="workflow-run-heading"
+          className="rounded-2xl border border-[#2F3A49] bg-[#151A22] p-6 shadow-2xl shadow-black/20"
+          id="workflow-run-content"
+          tabIndex={-1}
+        >
           <p className="font-mono text-xs uppercase tracking-[0.24em] text-[#7E8A9A]">
             DealDesk AI / Workflow Run
           </p>
           <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div>
-              <h1 className="text-3xl font-semibold tracking-tight text-white">
+              <h1 className="text-3xl font-semibold tracking-tight text-white" id="workflow-run-heading">
                 Workflow run intake state
               </h1>
               <p className="mt-3 text-sm leading-6 text-[#B9C3D1]">
-                {hasExtraction
+                {hasCompleteExtraction
                   ? "Typed deal facts extracted from stored intake evidence."
                   : "Intake event captured. Extraction in progress."}
               </p>
             </div>
-            <p className="rounded-full border border-[#F3B34C]/50 bg-[#F3B34C]/10 px-3 py-1 text-sm font-semibold text-[#F3B34C]">
-              {hasExtraction ? "Extraction complete" : "Extraction in progress"}
+            <p
+              aria-live="polite"
+              className="rounded-full border border-[#F3B34C]/50 bg-[#F3B34C]/10 px-3 py-1 text-sm font-semibold text-[#F3B34C]"
+              role="status"
+            >
+              {hasCompleteExtraction ? "Extraction complete" : "Extraction in progress"}
             </p>
           </div>
 
@@ -59,8 +80,8 @@ export default async function RunPage({ params }: RunPageProps) {
             <Detail label="Requested terms" value={run.dealRequest.requestedTerms || "Not provided"} />
           </dl>
 
-          <section className="mt-6 rounded-xl border border-[#2F3A49] bg-[#0E1116] p-4">
-            <h2 className="text-sm font-semibold uppercase tracking-[0.18em] text-[#B9C3D1]">
+          <section aria-labelledby="original-request-heading" className="mt-6 rounded-xl border border-[#2F3A49] bg-[#0E1116] p-4">
+            <h2 className="text-sm font-semibold uppercase tracking-[0.18em] text-[#B9C3D1]" id="original-request-heading">
               Original request text
             </h2>
             <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-white">
@@ -69,8 +90,8 @@ export default async function RunPage({ params }: RunPageProps) {
           </section>
 
           {run.dealRequest.attachmentText ? (
-            <section className="mt-4 rounded-xl border border-[#2F3A49] bg-[#0E1116] p-4">
-              <h2 className="text-sm font-semibold uppercase tracking-[0.18em] text-[#B9C3D1]">
+            <section aria-labelledby="attachment-text-heading" className="mt-4 rounded-xl border border-[#2F3A49] bg-[#0E1116] p-4">
+              <h2 className="text-sm font-semibold uppercase tracking-[0.18em] text-[#B9C3D1]" id="attachment-text-heading">
                 Attachment text
               </h2>
               <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-[#B9C3D1]">
@@ -82,8 +103,8 @@ export default async function RunPage({ params }: RunPageProps) {
           {run.dealFactExtraction ? (
             <ExtractionReview run={run} blockingMissingFacts={blockingMissingFacts} />
           ) : (
-            <section className="mt-6 rounded-xl border border-[#5BA7FF]/40 bg-[#5BA7FF]/10 p-4">
-              <h2 className="text-sm font-semibold uppercase tracking-[0.18em] text-[#B9C3D1]">
+            <section aria-labelledby="extraction-review-heading" className="mt-6 rounded-xl border border-[#5BA7FF]/40 bg-[#5BA7FF]/10 p-4">
+              <h2 className="text-sm font-semibold uppercase tracking-[0.18em] text-[#B9C3D1]" id="extraction-review-heading">
                 Extraction review
               </h2>
               <p className="mt-3 text-sm leading-6 text-[#B9C3D1]">
@@ -91,16 +112,23 @@ export default async function RunPage({ params }: RunPageProps) {
               </p>
               <form action={extractDealFacts} className="mt-4">
                 <input name="runId" type="hidden" value={run.id} />
-                <button className="rounded-lg bg-[#5BA7FF] px-4 py-2 text-sm font-semibold text-[#07111F] transition hover:bg-[#8CC2FF]" type="submit">
+                <button className="app-focus-ring rounded-lg border border-transparent bg-[#5BA7FF] px-4 py-2 text-sm font-semibold text-[#07111F] hover:bg-[#8CC2FF]" type="submit">
                   Extract facts from intake
                 </button>
               </form>
             </section>
           )}
+
+          {needsClarification ? <ClarificationRequiredSummary missingFacts={blockingMissingFacts} /> : null}
+          <CrmContextPanel run={run} />
+          <CustomerSendControls
+            showClarificationControl={needsClarification}
+            quoteReason={quoteSendReason}
+          />
         </section>
 
-        <aside className="rounded-2xl border border-[#2F3A49] bg-[#1D2430] p-6">
-          <h2 className="text-lg font-semibold text-white">Timeline</h2>
+        <aside aria-labelledby="timeline-heading" className="rounded-2xl border border-[#2F3A49] bg-[#1D2430] p-6">
+          <h2 className="text-lg font-semibold text-white" id="timeline-heading">Timeline</h2>
           {run.events.length > 0 ? (
             <ol className="mt-5 space-y-4">
               {run.events.map((event) => (
@@ -119,8 +147,108 @@ export default async function RunPage({ params }: RunPageProps) {
             </ol>
           ) : null}
         </aside>
+        </div>
+      </main>
+    </>
+  );
+}
+
+type ClarificationRequiredSummaryProps = {
+  readonly missingFacts: readonly MissingDealFact[];
+};
+
+function ClarificationRequiredSummary({ missingFacts }: ClarificationRequiredSummaryProps) {
+  const fieldSummary = formatFieldList(missingFacts.map((fact) => fact.field));
+
+  return (
+    <section aria-labelledby="clarification-review-heading" className="mt-6 rounded-xl border border-[#9B8CFF]/50 bg-[#9B8CFF]/10 p-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <h2 className="text-sm font-semibold uppercase tracking-[0.18em] text-[#D7D0FF]" id="clarification-review-heading">
+            Clarification required
+          </h2>
+          <p className="mt-3 text-sm leading-6 text-[#F4F7FB]">
+            Missing {fieldSummary}. Customer send remains blocked until these fields are resolved.
+          </p>
+        </div>
+        <p className="rounded-full border border-[#F3B34C]/50 bg-[#F3B34C]/10 px-3 py-1 text-sm font-semibold text-[#F8D89A]" role="status">
+          Manual clarification required
+        </p>
       </div>
-    </main>
+
+      <ul className="mt-5 space-y-2 text-sm text-[#F4F7FB]">
+        {missingFacts.map((fact) => (
+          <li key={fact.field} className="rounded-lg border border-[#2F3A49] bg-[#151A22] p-3">
+            <span className="font-semibold">{formatFieldName(fact.field)}</span>: {fact.reason}
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+function formatFieldList(fields: readonly string[]): string {
+  return fields.map(formatFieldName).join(", ");
+}
+
+function formatFieldName(field: string): string {
+  return field.replaceAll("_", " ");
+}
+
+type CustomerSendControlsProps = {
+  readonly showClarificationControl: boolean;
+  readonly quoteReason: string;
+};
+
+function CustomerSendControls({
+  quoteReason,
+  showClarificationControl,
+}: CustomerSendControlsProps) {
+  return (
+    <section aria-labelledby="customer-send-controls-heading" className="mt-6 rounded-xl border border-[#2F3A49] bg-[#0E1116] p-4">
+      <h2 className="text-sm font-semibold uppercase tracking-[0.18em] text-[#B9C3D1]" id="customer-send-controls-heading">
+        Customer send controls
+      </h2>
+      <div className="mt-4 grid gap-3 sm:grid-cols-2">
+        {showClarificationControl ? (
+          <DisabledSendButton idBase="send-clarification" label="Send clarification" reason="Blocked: clarify missing fields manually before customer send." />
+        ) : null}
+        <DisabledSendButton idBase="send-quote" label="Send quote" reason={quoteReason} />
+      </div>
+    </section>
+  );
+}
+
+
+type DisabledSendButtonProps = {
+  readonly idBase: string;
+  readonly label: string;
+  readonly reason: string;
+};
+
+function DisabledSendButton({ idBase, label, reason }: DisabledSendButtonProps) {
+  const reasonId = `${idBase.replace(/[^a-z0-9]+/gi, "-").replace(/^-|-$/g, "").toLowerCase()}-reason`;
+
+  return (
+    <div
+      aria-describedby={reasonId}
+      aria-label={`${label} blocked`}
+      className="app-focus-ring rounded-xl border border-[#F87171]/50 bg-[#F87171]/10 p-4"
+      role="group"
+      tabIndex={0}
+    >
+      <button
+        aria-describedby={reasonId}
+        className="app-focus-ring w-full cursor-not-allowed rounded-lg border border-[#F87171]/60 px-4 py-2 text-sm font-semibold text-[#FCA5A5]"
+        disabled
+        type="button"
+      >
+        [Blocked] {label}
+      </button>
+      <p id={reasonId} className="mt-3 text-sm leading-6 text-[#F4F7FB]">
+        {reason}
+      </p>
+    </div>
   );
 }
 
@@ -145,10 +273,10 @@ function ExtractionReview({ blockingMissingFacts, run }: ExtractionReviewProps) 
   ];
 
   return (
-    <section className="mt-6 rounded-xl border border-[#2F3A49] bg-[#0E1116] p-4">
+    <section aria-labelledby="extraction-review-heading" className="mt-6 rounded-xl border border-[#2F3A49] bg-[#0E1116] p-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h2 className="text-sm font-semibold uppercase tracking-[0.18em] text-[#B9C3D1]">
+          <h2 className="text-sm font-semibold uppercase tracking-[0.18em] text-[#B9C3D1]" id="extraction-review-heading">
             Extraction review
           </h2>
           <p className="mt-3 text-sm leading-6 text-[#B9C3D1]">
@@ -156,7 +284,7 @@ function ExtractionReview({ blockingMissingFacts, run }: ExtractionReviewProps) 
           </p>
         </div>
         {blockingMissingFacts.length > 0 && (
-          <p className="rounded-full border border-[#F3B34C]/50 bg-[#F3B34C]/10 px-3 py-1 text-sm font-semibold text-[#F3B34C]">
+          <p className="rounded-full border border-[#F3B34C]/50 bg-[#F3B34C]/10 px-3 py-1 text-sm font-semibold text-[#F3B34C]" role="status">
             Quote continuation blocked
           </p>
         )}
@@ -168,12 +296,12 @@ function ExtractionReview({ blockingMissingFacts, run }: ExtractionReviewProps) 
         ))}
       </div>
 
-      <section className="mt-5 rounded-xl border border-[#F87171]/50 bg-[#F87171]/10 p-4">
-        <h3 className="text-sm font-semibold text-[#FCA5A5]">Missing facts blocking quote continuation</h3>
+      <section aria-labelledby="missing-facts-blocker-heading" className="mt-5 rounded-xl border border-[#F87171]/50 bg-[#F87171]/10 p-4">
+        <h3 className="text-sm font-semibold text-[#FCA5A5]" id="missing-facts-blocker-heading">Missing facts blocking quote continuation</h3>
         <ul className="mt-3 space-y-3 text-sm text-[#F4F7FB]">
           {blockingMissingFacts.map((fact) => (
             <li key={fact.field}>
-              <span className="font-semibold">{fact.field}</span>: {fact.reason}
+              <span className="font-semibold">{formatFieldName(fact.field)}</span>: {fact.reason}
             </li>
           ))}
         </ul>
@@ -204,7 +332,7 @@ function FactCard({ fact, run }: FactCardProps) {
       <div className="mt-3 space-y-2">
         {citations.map((citation) => (
           <details key={citation.id} className="rounded-lg border border-[#9B8CFF]/40 bg-[#9B8CFF]/10 p-3">
-            <summary className="cursor-pointer text-sm font-semibold text-[#D7D0FF]">
+            <summary className="app-focus-ring cursor-pointer rounded-md text-sm font-semibold text-[#D7D0FF]">
               Evidence: {citation.label}
             </summary>
             <p className="mt-2 text-xs uppercase tracking-[0.14em] text-[#B9C3D1]">
