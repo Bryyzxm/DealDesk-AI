@@ -3,11 +3,14 @@ import path from "node:path";
 
 import type {
   AuditEvent,
+  CrmAccountContext,
+  CrmLookupState,
   DealFactExtraction,
   DealRequestInput,
   EvidenceCitation,
   ExtractedDealFact,
   MissingDealFact,
+  WorkflowToolCall,
   WorkflowRun,
   WorkflowRunId,
 } from "../domain/workflow-run";
@@ -75,6 +78,7 @@ function isWorkflowRun(value: unknown): value is WorkflowRun {
     isDealRequestInput(value.dealRequest) &&
     isOptionalExtractionStatus(value.extractionStatus) &&
     isOptionalDealFactExtraction(value.dealFactExtraction) &&
+    isOptionalCrmLookupState(value.crmLookup) &&
     Array.isArray(value.events) &&
     value.events.length > 0 &&
     value.events.every((event) => isAuditEvent(event, runId))
@@ -101,7 +105,9 @@ function isAuditEvent(value: unknown, runId: string): value is AuditEvent {
     value.id.startsWith("evt_") &&
     value.runId === runId &&
     typeof value.createdAt === "string" &&
-    (value.type === "deal_request_intake_created" || value.type === "deal_facts_extracted") &&
+    (value.type === "deal_request_intake_created" ||
+      value.type === "deal_facts_extracted" ||
+      value.type === "crm_account_context_retrieved") &&
     typeof value.source === "string" &&
     typeof value.summary === "string"
   );
@@ -113,6 +119,71 @@ function isOptionalExtractionStatus(value: unknown): value is WorkflowRun["extra
 
 function isOptionalDealFactExtraction(value: unknown): value is DealFactExtraction | undefined {
   return value === undefined || isDealFactExtraction(value);
+}
+
+function isOptionalCrmLookupState(value: unknown): value is CrmLookupState | undefined {
+  return value === undefined || isCrmLookupState(value);
+}
+
+function isCrmLookupState(value: unknown): value is CrmLookupState {
+  if (!isRecord(value) || typeof value.accountName !== "string" || !isWorkflowToolCall(value.toolCall)) {
+    return false;
+  }
+
+  switch (value.status) {
+    case "success":
+      return isCrmAccountContext(value.accountContext);
+    case "account_name_missing":
+    case "missing_record":
+      return isWorkflowBlocker(value.blocker);
+    case "adapter_failure":
+      return true;
+    default:
+      return false;
+  }
+}
+
+function isCrmAccountContext(value: unknown): value is CrmAccountContext {
+  return (
+    isRecord(value) &&
+    typeof value.customerTier === "string" &&
+    typeof value.priorDiscount === "string" &&
+    typeof value.hasActiveContract === "boolean" &&
+    typeof value.owner === "string"
+  );
+}
+
+function isWorkflowBlocker(value: unknown): boolean {
+  return (
+    isRecord(value) &&
+    typeof value.reason === "string" &&
+    typeof value.blocksQuoteContinuation === "boolean"
+  );
+}
+
+function isWorkflowToolCall(value: unknown): value is WorkflowToolCall {
+  return (
+    isRecord(value) &&
+    typeof value.id === "string" &&
+    value.id.startsWith("tool_") &&
+    typeof value.toolName === "string" &&
+    value.sideEffectClass === "read" &&
+    (value.status === "success" || value.status === "blocked" || value.status === "failed") &&
+    typeof value.durationMs === "number" &&
+    typeof value.resultSummary === "string" &&
+    isOptionalWorkflowToolError(value.error)
+  );
+}
+
+function isOptionalWorkflowToolError(value: unknown): value is WorkflowToolCall["error"] {
+  return (
+    value === undefined ||
+    (isRecord(value) &&
+      (value.code === "crm_account_not_found" ||
+        value.code === "crm_adapter_unavailable" ||
+        value.code === "crm_account_name_missing") &&
+      typeof value.message === "string")
+  );
 }
 
 function isDealFactExtraction(value: unknown): value is DealFactExtraction {
