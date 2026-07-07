@@ -1,0 +1,70 @@
+- main [ref=e2]:
+  - link "Skip to workflow run content" [ref=e3] [cursor=pointer]:
+    - /url: "#workflow-run-content"
+  - generic [ref=e4]:
+    - region "Workflow run intake state" [ref=e5]:
+      - paragraph [ref=e6]: DealDesk AI / Workflow Run
+      - generic [ref=e7]:
+        - generic [ref=e8]:
+          - heading "Workflow run intake state" [level=1] [ref=e9]
+          - paragraph [ref=e10]: Intake event captured. Extraction in progress.
+        - status [ref=e11]: Extraction in progress
+      - generic [ref=e12]:
+        - generic [ref=e13]:
+          - term [ref=e14]: Run ID
+          - definition [ref=e15]: run_26f281c6-db5f-4f14-9758-81cf3639f56b
+        - generic [ref=e16]:
+          - term [ref=e17]: Created timestamp
+          - definition [ref=e18]: 2026-07-07T08:20:27.057Z
+        - generic [ref=e19]:
+          - term [ref=e20]: Sender
+          - definition [ref=e21]: maya.chen@example.test
+        - generic [ref=e22]:
+          - term [ref=e23]: Account
+          - definition [ref=e24]: Northstar Demo Systems
+        - generic [ref=e25]:
+          - term [ref=e26]: Requested products
+          - definition [ref=e27]: DealDesk AI Enterprise, 75 seats, premium support
+        - generic [ref=e28]:
+          - term [ref=e29]: Requested terms
+          - definition [ref=e30]: Net 60, renewal uplift capped at 4%, start next month
+      - region "Original request text" [ref=e31]:
+        - heading "Original request text" [level=2] [ref=e32]
+        - paragraph [ref=e33]: Can you get us a quote for 75 Enterprise seats before Friday? Finance is asking for net 60 again, legal wants the old renewal cap language, and the VP keeps saying the rollout has to start next month even though procurement has not finished the vendor form.
+      - region "Attachment text" [ref=e34]:
+        - heading "Attachment text" [level=2] [ref=e35]
+        - paragraph [ref=e36]: "Forwarded customer note: please keep the legacy renewal cap wording and call out any rush onboarding costs separately."
+      - region "Extraction review" [ref=e37]:
+        - heading "Extraction review" [level=2] [ref=e38]
+        - paragraph [ref=e39]: Demo extraction will validate typed deal facts, append an audit event, and keep quote continuation blocked until missing facts are resolved.
+        - button "Extract facts from intake" [ref=e41]
+      - region "CRM context" [ref=e42]:
+        - generic [ref=e43]:
+          - generic [ref=e44]:
+            - heading "CRM context" [level=2] [ref=e45]
+            - paragraph [ref=e46]: Read-only account enrichment for customer tier, ownership, contract status, and prior discount history.
+          - button "Retrieve CRM context" [ref=e48]
+        - paragraph [ref=e49]: CRM context has not been retrieved for this workflow run.
+      - region "Customer send controls" [ref=e50]:
+        - heading "Customer send controls" [level=2] [ref=e51]
+        - group "Send quote blocked" [ref=e53]:
+          - button "[Blocked] Send quote" [disabled] [ref=e54]
+          - paragraph [ref=e55]: "Blocked: approval is required before customer send."
+    - complementary "Timeline" [ref=e56]:
+      - heading "Timeline" [level=2] [ref=e57]
+      - list [ref=e58]:
+        - listitem [ref=e59]:
+          - paragraph [ref=e60]: deal_request_intake_created
+          - generic [ref=e61]:
+            - generic [ref=e62]:
+              - term [ref=e63]: Timestamp
+              - definition [ref=e64]: 2026-07-07T08:20:27.057Z
+            - generic [ref=e65]:
+              - term [ref=e66]: Run ID
+              - definition [ref=e67]: run_26f281c6-db5f-4f14-9758-81cf3639f56b
+            - generic [ref=e68]:
+              - term [ref=e69]: Source
+              - definition [ref=e70]: seed:messy-enterprise-renewal
+            - generic [ref=e71]:
+              - term [ref=e72]: Payload summary
+              - definition [ref=e73]: "Deal request intake captured from seed:messy-enterprise-renewal; populated fields: request text, sender, account, products, terms, attachment."

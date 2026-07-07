@@ -1,0 +1,37 @@
+- main [ref=e2]:
+  - link "Skip to deal intake content" [ref=e3] [cursor=pointer]:
+    - /url: "#deal-intake-content"
+  - generic [ref=e4]:
+    - region "Submit messy deal request" [ref=e5]:
+      - paragraph [ref=e6]: DealDesk AI / Deal Intake
+      - heading "Submit messy deal request" [level=1] [ref=e7]
+      - paragraph [ref=e8]: Capture original customer wording and start a traceable workflow run.
+      - form "Submit messy deal request" [ref=e9]:
+        - generic [ref=e10]:
+          - text: Sender
+          - textbox "Sender" [ref=e11]: maya.chen@example.test
+        - generic [ref=e12]:
+          - text: Account name
+          - textbox "Account name" [ref=e13]: Northstar Demo Systems
+        - generic [ref=e14]:
+          - text: Free-form request text
+          - textbox "Free-form request text" [ref=e15]: Can you get us a quote for 75 Enterprise seats before Friday? Finance is asking for net 60 again, legal wants the old renewal cap language, and the VP keeps saying the rollout has to start next month even though procurement has not finished the vendor form.
+        - generic [ref=e16]:
+          - text: Requested products
+          - textbox "Requested products" [ref=e17]: DealDesk AI Enterprise, 75 seats, premium support
+        - generic [ref=e18]:
+          - text: Requested terms
+          - textbox "Requested terms" [ref=e19]: Net 60, renewal uplift capped at 4%, start next month
+        - generic [ref=e20]:
+          - text: Optional attachment text
+          - textbox "Optional attachment text" [ref=e21]: "Forwarded customer note: please keep the legacy renewal cap wording and call out any rush onboarding costs separately."
+        - generic [ref=e22]:
+          - button "Create workflow run" [ref=e23]
+          - link "Load seeded messy inquiry" [ref=e24] [cursor=pointer]:
+            - /url: /?fixture=messy
+    - complementary [ref=e25]:
+      - heading "Workflow run output" [level=2] [ref=e26]
+      - paragraph [ref=e27]: Valid submission opens a Workflow Run page with stored intake state. Empty request text creates no run.
+      - generic [ref=e28]:
+        - paragraph [ref=e29]: After submit
+        - paragraph [ref=e30]: Run ID, original input, created timestamp, extraction status, and timeline appear on the run page.

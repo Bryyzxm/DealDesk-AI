@@ -1,0 +1,154 @@
+- main [ref=e2]:
+  - link "Skip to workflow run content" [ref=e3] [cursor=pointer]:
+    - /url: "#workflow-run-content"
+  - generic [ref=e4]:
+    - region "Workflow run intake state" [ref=e5]:
+      - paragraph [ref=e6]: DealDesk AI / Workflow Run
+      - generic [ref=e7]:
+        - generic [ref=e8]:
+          - heading "Workflow run intake state" [level=1] [ref=e9]
+          - paragraph [ref=e10]: Typed deal facts extracted from stored intake evidence.
+        - status [ref=e11]: Extraction complete
+      - generic [ref=e12]:
+        - generic [ref=e13]:
+          - term [ref=e14]: Run ID
+          - definition [ref=e15]: run_26f281c6-db5f-4f14-9758-81cf3639f56b
+        - generic [ref=e16]:
+          - term [ref=e17]: Created timestamp
+          - definition [ref=e18]: 2026-07-07T08:20:27.057Z
+        - generic [ref=e19]:
+          - term [ref=e20]: Sender
+          - definition [ref=e21]: maya.chen@example.test
+        - generic [ref=e22]:
+          - term [ref=e23]: Account
+          - definition [ref=e24]: Northstar Demo Systems
+        - generic [ref=e25]:
+          - term [ref=e26]: Requested products
+          - definition [ref=e27]: DealDesk AI Enterprise, 75 seats, premium support
+        - generic [ref=e28]:
+          - term [ref=e29]: Requested terms
+          - definition [ref=e30]: Net 60, renewal uplift capped at 4%, start next month
+      - region "Original request text" [ref=e31]:
+        - heading "Original request text" [level=2] [ref=e32]
+        - paragraph [ref=e33]: Can you get us a quote for 75 Enterprise seats before Friday? Finance is asking for net 60 again, legal wants the old renewal cap language, and the VP keeps saying the rollout has to start next month even though procurement has not finished the vendor form.
+      - region "Attachment text" [ref=e34]:
+        - heading "Attachment text" [level=2] [ref=e35]
+        - paragraph [ref=e36]: "Forwarded customer note: please keep the legacy renewal cap wording and call out any rush onboarding costs separately."
+      - region "Extraction review" [ref=e37]:
+        - generic [ref=e38]:
+          - generic [ref=e39]:
+            - heading "Extraction review" [level=2] [ref=e40]
+            - paragraph [ref=e41]: Demo extraction produced typed facts from stored intake fields.
+          - status [ref=e42]: Quote continuation blocked
+        - generic [ref=e43]:
+          - article [ref=e44]:
+            - paragraph [ref=e45]: Buyer intent
+            - paragraph [ref=e46]: Quote request for DealDesk AI Enterprise seats
+            - paragraph [ref=e47]: "Confidence: high"
+            - generic [ref=e48]:
+              - group [ref=e49]:
+                - 'generic "Evidence: Original request" [ref=e50] [cursor=pointer]'
+              - group [ref=e51]:
+                - 'generic "Evidence: Requested products" [ref=e52] [cursor=pointer]'
+          - article [ref=e53]:
+            - paragraph [ref=e54]: Urgency
+            - paragraph [ref=e55]: Customer wants a quote before Friday
+            - paragraph [ref=e56]: "Confidence: high"
+            - group [ref=e58]:
+              - 'generic "Evidence: Original request" [ref=e59] [cursor=pointer]'
+          - article [ref=e60]:
+            - paragraph [ref=e61]: Seats and package
+            - paragraph [ref=e62]: 75 Enterprise seats with premium support
+            - paragraph [ref=e63]: "Confidence: high"
+            - group [ref=e65]:
+              - 'generic "Evidence: Requested products" [ref=e66] [cursor=pointer]'
+          - article [ref=e67]:
+            - paragraph [ref=e68]: Payment terms
+            - paragraph [ref=e69]: Net 60 requested
+            - paragraph [ref=e70]: "Confidence: high"
+            - generic [ref=e71]:
+              - group [ref=e72]:
+                - 'generic "Evidence: Original request" [ref=e73] [cursor=pointer]'
+              - group [ref=e74]:
+                - 'generic "Evidence: Requested terms" [ref=e75] [cursor=pointer]'
+          - article [ref=e76]:
+            - paragraph [ref=e77]: Renewal cap
+            - paragraph [ref=e78]: Renewal uplift capped at 4% with legacy cap language
+            - paragraph [ref=e79]: "Confidence: medium"
+            - generic [ref=e80]:
+              - group [ref=e81]:
+                - 'generic "Evidence: Requested terms" [ref=e82] [cursor=pointer]'
+              - group [ref=e83]:
+                - 'generic "Evidence: Attachment note" [ref=e84] [cursor=pointer]'
+          - article [ref=e85]:
+            - paragraph [ref=e86]: Requested date
+            - paragraph [ref=e87]: Quote before Friday; rollout start next month
+            - paragraph [ref=e88]: "Confidence: medium"
+            - generic [ref=e89]:
+              - group [ref=e90]:
+                - 'generic "Evidence: Original request" [ref=e91] [cursor=pointer]'
+              - group [ref=e92]:
+                - 'generic "Evidence: Requested terms" [ref=e93] [cursor=pointer]'
+        - region "Missing facts blocking quote continuation" [ref=e94]:
+          - heading "Missing facts blocking quote continuation" [level=3] [ref=e95]
+          - list [ref=e96]:
+            - listitem [ref=e97]: "procurement status: Procurement has not finished the vendor form."
+            - listitem [ref=e98]: "billing contact: Billing or procurement contact is not named in the request."
+      - region "Clarification required" [ref=e99]:
+        - generic [ref=e100]:
+          - generic [ref=e101]:
+            - heading "Clarification required" [level=2] [ref=e102]
+            - paragraph [ref=e103]: Missing procurement status, billing contact. Customer send remains blocked until these fields are resolved.
+          - status [ref=e104]: Manual clarification required
+        - list [ref=e105]:
+          - listitem [ref=e106]: "procurement status: Procurement has not finished the vendor form."
+          - listitem [ref=e107]: "billing contact: Billing or procurement contact is not named in the request."
+      - region "CRM context" [ref=e108]:
+        - generic [ref=e109]:
+          - generic [ref=e110]:
+            - heading "CRM context" [level=2] [ref=e111]
+            - paragraph [ref=e112]: Read-only account enrichment for customer tier, ownership, contract status, and prior discount history.
+          - button "Retrieve CRM context" [ref=e114]
+        - paragraph [ref=e115]: CRM context has not been retrieved for this workflow run.
+      - region "Customer send controls" [ref=e116]:
+        - heading "Customer send controls" [level=2] [ref=e117]
+        - generic [ref=e118]:
+          - group "Send clarification blocked" [ref=e119]:
+            - button "[Blocked] Send clarification" [disabled] [ref=e120]
+            - paragraph [ref=e121]: "Blocked: clarify missing fields manually before customer send."
+          - group "Send quote blocked" [ref=e122]:
+            - button "[Blocked] Send quote" [disabled] [ref=e123]
+            - paragraph [ref=e124]: "Blocked: missing procurement status, billing contact before quote continuation."
+    - complementary "Timeline" [ref=e125]:
+      - heading "Timeline" [level=2] [ref=e126]
+      - list [ref=e127]:
+        - listitem [ref=e128]:
+          - paragraph [ref=e129]: deal_request_intake_created
+          - generic [ref=e130]:
+            - generic [ref=e131]:
+              - term [ref=e132]: Timestamp
+              - definition [ref=e133]: 2026-07-07T08:20:27.057Z
+            - generic [ref=e134]:
+              - term [ref=e135]: Run ID
+              - definition [ref=e136]: run_26f281c6-db5f-4f14-9758-81cf3639f56b
+            - generic [ref=e137]:
+              - term [ref=e138]: Source
+              - definition [ref=e139]: seed:messy-enterprise-renewal
+            - generic [ref=e140]:
+              - term [ref=e141]: Payload summary
+              - definition [ref=e142]: "Deal request intake captured from seed:messy-enterprise-renewal; populated fields: request text, sender, account, products, terms, attachment."
+        - listitem [ref=e143]:
+          - paragraph [ref=e144]: deal_facts_extracted
+          - generic [ref=e145]:
+            - generic [ref=e146]:
+              - term [ref=e147]: Timestamp
+              - definition [ref=e148]: 2026-07-07T08:21:03.026Z
+            - generic [ref=e149]:
+              - term [ref=e150]: Run ID
+              - definition [ref=e151]: run_26f281c6-db5f-4f14-9758-81cf3639f56b
+            - generic [ref=e152]:
+              - term [ref=e153]: Source
+              - definition [ref=e154]: seed:messy-enterprise-renewal
+            - generic [ref=e155]:
+              - term [ref=e156]: Payload summary
+              - definition [ref=e157]: Deal facts extracted with 4 evidence citations and 2 missing facts.

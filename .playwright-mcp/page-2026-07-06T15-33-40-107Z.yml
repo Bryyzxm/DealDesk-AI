@@ -1,0 +1,40 @@
+- generic [active] [ref=e1]:
+  - main [ref=e2]:
+    - link "Skip to deal intake content" [ref=e3] [cursor=pointer]:
+      - /url: "#deal-intake-content"
+    - generic [ref=e4]:
+      - region "Submit messy deal request" [ref=e5]:
+        - paragraph [ref=e6]: DealDesk AI / Deal Intake
+        - heading "Submit messy deal request" [level=1] [ref=e7]
+        - paragraph [ref=e8]: Capture original customer wording and start a traceable workflow run.
+        - form "Submit messy deal request" [ref=e9]:
+          - generic [ref=e10]:
+            - text: Sender
+            - textbox "Sender" [ref=e11]
+          - generic [ref=e12]:
+            - text: Account name
+            - textbox "Account name" [ref=e13]
+          - generic [ref=e14]:
+            - text: Free-form request text
+            - textbox "Free-form request text" [ref=e15]
+          - generic [ref=e16]:
+            - text: Requested products
+            - textbox "Requested products" [ref=e17]
+          - generic [ref=e18]:
+            - text: Requested terms
+            - textbox "Requested terms" [ref=e19]
+          - generic [ref=e20]:
+            - text: Optional attachment text
+            - textbox "Optional attachment text" [ref=e21]
+          - generic [ref=e22]:
+            - button "Create workflow run" [ref=e23]
+            - link "Load seeded messy inquiry" [ref=e24] [cursor=pointer]:
+              - /url: /?fixture=messy
+      - complementary [ref=e25]:
+        - heading "Workflow run output" [level=2] [ref=e26]
+        - paragraph [ref=e27]: Valid submission opens a Workflow Run page with stored intake state. Empty request text creates no run.
+        - generic [ref=e28]:
+          - paragraph [ref=e29]: After submit
+          - paragraph [ref=e30]: Run ID, original input, created timestamp, extraction status, and timeline appear on the run page.
+  - button "Open Next.js Dev Tools" [ref=e36] [cursor=pointer]:
+    - img [ref=e37]
